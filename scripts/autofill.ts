@@ -93,7 +93,7 @@ async function main() {
   const done: AutofillResult = counts ? { state: "filled", filled: counts.fill, manual: counts.manual } : { state: cls.kind === "login" ? "login" : "opened" };
   if (dryRun) return report(done);
 
-  const { page, closed, release } = await openChromeTab();
+  const { page, release } = await openChromeTab();
   await page.goto(plan?.url ?? t.url, { waitUntil: "domcontentloaded" });
 
   if (plan) {
@@ -104,9 +104,8 @@ async function main() {
     console.log("\nDone. Check the highlighted fields in Chrome, **submit the form yourself**, then mark the job as Applied in Offer Pilot.");
   }
   report(done);
-  console.log("Close the tab or the Chrome window to finish.");
-  await closed;
   await release();
+  console.log("Chrome stays open for you. Close the tab whenever you are done; nothing is waiting on it.");
 }
 
 main().catch((err) => {

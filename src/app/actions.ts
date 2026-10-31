@@ -47,8 +47,8 @@ export async function setJobStatus(formData: FormData) {
 // Longer than the longest normal run: reading the form, starting Chrome and filling it
 const AUTOFILL_WAIT_MS = 45_000;
 
-// Start `pnpm autofill <id>` in the background: it opens Chrome, fills the form and waits for the user
-// to submit. The run keeps going after this returns; we only wait for its first result.
+// Start `pnpm autofill <id>` in the background: it opens Chrome, fills the form and exits.
+// Chrome stays open for the user to review and submit.
 export async function startAutofill(_previous: AutofillResult | null, formData: FormData): Promise<AutofillResult> {
   assertWritable();
   const id = formData.get("id");

@@ -92,7 +92,7 @@ Click "Autofill" → Chrome opens and fills what it can
    ↓
 Review the whole form, complete the highlighted fields → click Submit yourself
    ↓
-Close the tab → click "Applied" in the web app
+Close the tab when you are done → click "Applied" in the web app
 ```
 
 ### 4.1 Pick jobs
@@ -166,7 +166,7 @@ Markers in the output: ✅ will be filled; 🟡 for you to fill (highlighted); �
 ## 7. Development
 
 ```bash
-pnpm test           # all 27 tests: unit, browser and i18n (browser tests need Chrome)
+pnpm test           # all tests: unit, browser and i18n (browser tests need Chrome)
 pnpm test:unit      # unit tests only
 pnpm test:browser   # browser tests only
 pnpm lint
