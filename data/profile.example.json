@@ -1,0 +1,33 @@
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "preferredName": "Jane",
+  "email": "jane@example.com",
+  "phone": "555-555-5555",
+  "city": "San Francisco",
+  "state": "California",
+  "country": "United States",
+  "zip": "TODO(confirm)",
+  "timeZone": "Pacific Time (PT)",
+  "linkedin": "https://www.linkedin.com/in/[TODO(confirm)]",
+  "github": "https://github.com/[TODO(confirm)]",
+  "portfolio": "TODO(confirm)",
+  "currentCompany": "ABC",
+  "currentTitle": "Software Engineer",
+  "yearsOfExperience": "10",
+  "pronouns": "TODO(confirm)",
+  "workAuthorizedUS": true,
+  "needsSponsorship": false,
+  "willingToRelocate": false,
+  "salaryExpectation": "TODO(confirm)",
+  "startDate": "Immediately",
+  "heardFrom": "Company website",
+  "eeo": {
+    "gender": "decline",
+    "race": "decline",
+    "hispanic": "decline",
+    "veteran": "decline",
+    "disability": "decline"
+  },
+  "resumePath": "/absolute/path/to/resume.pdf"
+}

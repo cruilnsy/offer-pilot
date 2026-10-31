@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Lever-like test form</title></head>
+<body>
+  <!-- Mimics the Lever apply page: fields are addressed by name, custom questions are radio
+       lists inside labels, the location field is an autocomplete filled from a search. -->
+  <form id="application">
+    <input type="text" name="name">
+    <input type="file" name="resume" id="resume-upload-input">
+    <select name="opportunityLocationId"><option value="">Select...</option><option value="a">San Mateo, California</option><option value="b">Springfield, California</option></select>
+    <input class="location-input" id="location-input" type="text" name="location">
+    <input id="selected-location" type="hidden" name="selectedLocation">
+    <div class="dropdown-results"></div>
+    <ul>
+      <li><label><input type="radio" name="cards[c1][field0]" value="Yes"><span class="application-answer-alternative">Yes</span></label></li>
+      <li><label><input type="radio" name="cards[c1][field0]" value="No"><span class="application-answer-alternative">No</span></label></li>
+    </ul>
+    <ul>
+      <li><label><input type="checkbox" name="cards[c2][field1]" value="Seattle, Washington"><span>Seattle, Washington</span></label></li>
+      <li><label><input type="checkbox" name="cards[c2][field1]" value="Springfield, California"><span>Springfield, California</span></label></li>
+    </ul>
+    <ul>
+      <li><label><input type="radio" name="eeo[race]" value="Hispanic or Latino"><span class="eeo-option-text">Hispanic or Latino</span><div class="eeo-option-description">A person of Cuban, Mexican...</div></label></li>
+      <li><label><input type="radio" name="eeo[race]" value="Decline to self-identify"><span class="eeo-option-text">Decline to self-identify</span></label></li>
+    </ul>
+    <button type="submit" id="submit">Submit application</button>
+  </form>
+  <script>
+    window.__submitted = false;
+    document.getElementById("application").addEventListener("submit", (e) => { e.preventDefault(); window.__submitted = true; });
+    const loc = document.getElementById("location-input");
+    const results = document.querySelector(".dropdown-results");
+    loc.addEventListener("input", () => {
+      // Like Lever: suggestions use abbreviations, so the full "Springfield, California" finds nothing
+      const all = ["Springfield, CA, USA", "Springfield, Zacapa, GTM"];
+      results.innerHTML = "";
+      setTimeout(() => {
+        for (const text of all.filter((t) => t.toLowerCase().startsWith(loc.value.toLowerCase()))) {
+          const div = document.createElement("div");
+          div.className = "dropdown-location";
+          div.textContent = text;
+          div.addEventListener("click", () => {
+            loc.value = text;
+            document.getElementById("selected-location").value = JSON.stringify({ name: text });
+            results.innerHTML = "";
+          });
+          results.appendChild(div);
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>

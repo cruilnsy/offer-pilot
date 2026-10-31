@@ -1,0 +1,13 @@
+{
+  "direct": [
+    { "id": "mock-ats", "label": "Acme ATS", "kind": "ats", "url": "https://example.com/acme-ats", "how": "Sample source, per company" },
+    { "id": "mock-jobs", "label": "Globex Jobs", "kind": "ats", "url": "https://example.com/globex-jobs", "how": "Sample source, per company" },
+    { "id": "mock-careers", "label": "Initech Careers", "kind": "ats", "url": "https://example.com/initech-careers", "how": "Sample source, per company" }
+  ],
+  "disabled": [],
+  "workarounds": [
+    { "id": "mock-job-board", "label": "Mock Job Board", "url": "https://example.com/job-board", "kind": "Job board", "plan": "Sample entry: check it by hand every week", "status": "using" },
+    { "id": "mock-talent-network", "label": "Mock Talent Network", "url": "https://example.com/talent", "kind": "Talent network", "plan": "Sample entry: apply to join the network", "status": "planned" },
+    { "id": "mock-freelance-site", "label": "Mock Freelance Site", "url": "https://example.com/freelance", "kind": "Freelance site", "plan": "Sample entry: not a good fit right now", "status": "skipped" }
+  ]
+}

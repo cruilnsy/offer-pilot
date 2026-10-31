@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Greenhouse-like test form</title></head>
+<body>
+  <!-- Mimics the hosted Greenhouse form: inputs use the API field name as id,
+       dropdowns are react-select comboboxes whose options appear after a click. -->
+  <form id="application">
+    <label for="first_name">First Name*</label><input id="first_name" type="text">
+    <label for="email">Email*</label><input id="email" type="text">
+    <label for="resume">Attach</label><input id="resume" type="file">
+    <div class="select-shell"><input id="question_1" role="combobox" type="text" data-options="Yes|No"></div>
+    <div class="select-shell"><input id="4028768003" role="combobox" type="text" data-options="Female|Male|I prefer not to say"></div>
+    <div class="select-shell"><input id="question_pronouns" role="combobox" type="text" data-options="She/her/hers|He/him/his"></div>
+    <div class="select-shell"><input id="country" role="combobox" type="text" data-options="United Kingdom +44|United States +1|United States Minor Outlying Islands +1"></div>
+    <label for="native">Native</label><select id="native"><option>Arizona</option><option>California</option></select>
+    <button type="submit" id="submit">Submit application</button>
+  </form>
+  <script>
+    window.__submitted = false;
+    document.getElementById("application").addEventListener("submit", (e) => { e.preventDefault(); window.__submitted = true; });
+    for (const input of document.querySelectorAll("[role=combobox]")) {
+      const open = () => {
+        document.querySelectorAll(".menu").forEach((m) => m.remove());
+        const menu = document.createElement("div");
+        menu.className = "menu";
+        input.dataset.options.split("|").forEach((label, i) => {
+          if (input.value && !label.toLowerCase().startsWith(input.value.toLowerCase())) return;
+          const opt = document.createElement("div");
+          opt.id = `react-select-${input.id}-option-${i}`;
+          opt.setAttribute("role", "option");
+          opt.textContent = label;
+          opt.addEventListener("click", () => { input.dataset.selected = label; input.value = ""; menu.remove(); });
+          menu.appendChild(opt);
+        });
+        input.parentElement.appendChild(menu);
+      };
+      input.addEventListener("click", open);
+      input.addEventListener("input", open);
+    }
+  </script>
+</body>
+</html>
