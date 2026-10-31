@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><title>Ashby-like test form</title>
+  <style>.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }</style>
+</head>
+<body>
+  <!-- Mimics the Ashby application form: every question sits in [data-field-path], yes/no are
+       buttons, radio/checkbox inputs are visually hidden behind labels, location is a combobox. -->
+  <form id="application">
+    <div data-field-path="_systemfield_name"><label for="_systemfield_name">Name</label><input id="_systemfield_name" type="text"></div>
+    <div data-field-path="_systemfield_resume"><label>Resume</label><input id="_systemfield_resume" type="file" class="sr-only"></div>
+    <div data-field-path="q-sponsor">
+      <label>Will you now or in the future require sponsorship?</label>
+      <div><button type="button" aria-pressed="false" data-option="yes">Yes</button><button type="button" aria-pressed="false" data-option="no">No</button></div>
+    </div>
+    <div data-field-path="q-domain"><fieldset>
+      <label>What technical domain do you prefer?</label>
+      <div><input type="radio" class="sr-only" id="r0" name="x_q-domain"><label for="r0">Front End</label></div>
+      <div><input type="radio" class="sr-only" id="r1" name="x_q-domain"><label for="r1">Full Stack</label></div>
+    </fieldset></div>
+    <div data-field-path="q-ack"><fieldset>
+      <label>Applicant Arbitration Agreement Acknowledgement</label>
+      <div><input type="checkbox" class="sr-only" id="c0" name="I acknowledge"><label for="c0">I acknowledge</label></div>
+    </fieldset></div>
+    <div data-field-path="_systemfield_location">
+      <label>Where are you currently located?</label>
+      <input role="combobox" placeholder="Start typing...">
+    </div>
+    <button type="submit" id="submit">Submit Application</button>
+  </form>
+  <script>
+    window.__submitted = false;
+    document.getElementById("application").addEventListener("submit", (e) => { e.preventDefault(); window.__submitted = true; });
+    for (const btn of document.querySelectorAll("button[data-option]")) {
+      btn.addEventListener("click", () => {
+        btn.parentElement.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
+      });
+    }
+    const combo = document.querySelector("[role=combobox]");
+    combo.addEventListener("input", () => {
+      document.querySelectorAll("[role=listbox]").forEach((l) => l.remove());
+      const list = document.createElement("div");
+      list.setAttribute("role", "listbox");
+      for (const text of ["Springfield, California, United States", "Springfield, Texas, United States"]) {
+        if (!text.toLowerCase().startsWith(combo.value.toLowerCase())) continue;
+        const opt = document.createElement("div");
+        opt.setAttribute("role", "option");
+        opt.textContent = text;
+        opt.addEventListener("click", () => { combo.value = text; list.remove(); });
+        list.appendChild(opt);
+      }
+      document.body.appendChild(list);
+    });
+  </script>
+</body>
+</html>

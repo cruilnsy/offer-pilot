@@ -1,0 +1,49 @@
+{
+  "name": "offer-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "demo": "OFFER_PILOT_DEMO=1 next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "db:push": "mkdir -p data && drizzle-kit push",
+    "fetch-jobs": "tsx scripts/fetch-jobs.ts",
+    "check-filter": "tsx scripts/check-filter.ts",
+    "check-dedupe": "tsx scripts/check-dedupe.ts",
+    "autofill": "tsx scripts/autofill.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:unit": "tsx --test tests/autofill.test.ts tests/autofill-ats.test.ts",
+    "test:browser": "tsx --test tests/*.browser.test.ts",
+    "test:e2e": "tsx --test --test-concurrency=1 tests/e2e/*.e2e.ts",
+    "schedule:install": "zsh scripts/schedule/install.sh",
+    "schedule:uninstall": "zsh scripts/schedule/install.sh uninstall"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4",
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "playwright": "^1.64.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@12.9.1"
+}
