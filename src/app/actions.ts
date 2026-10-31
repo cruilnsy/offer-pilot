@@ -1,7 +1,9 @@
 "use server";
 
 import { spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { refresh, revalidatePath } from "next/cache";
@@ -12,8 +14,9 @@ import { JOB_STATUSES, type JobStatus } from "@/db/schema";
 import { isLocale } from "@/i18n/dictionaries";
 import { LOCALE_COOKIE } from "@/i18n/locale";
 import { getLocale } from "@/i18n/locale";
+import { waitForStatus, writeStatus, type AutofillResult } from "@/lib/autofill/status";
 import { createBoard, deleteBoard, updateBoard } from "@/lib/board-store";
-import { addCompany, removeCompany } from "@/lib/companies";
+import { addCompany, DATA_DIR, removeCompany } from "@/lib/companies";
 import { DEMO } from "@/lib/demo";
 import { cleanRules, type BoardRules } from "@/lib/filter";
 import { getBoardPreview } from "@/lib/jobs";
@@ -41,15 +44,29 @@ export async function setJobStatus(formData: FormData) {
   refresh();
 }
 
-// Start `pnpm autofill <id>` in the background: it opens Chrome, fills the form and waits for the user to submit.
-export async function startAutofill(formData: FormData) {
+// Longer than the longest normal run: reading the form, starting Chrome and filling it
+const AUTOFILL_WAIT_MS = 45_000;
+
+// Start `pnpm autofill <id>` in the background: it opens Chrome, fills the form and exits.
+// Chrome stays open for the user to review and submit.
+export async function startAutofill(_previous: AutofillResult | null, formData: FormData): Promise<AutofillResult> {
   assertWritable();
   const id = formData.get("id");
   if (typeof id !== "string" || !db.select({ id: schema.jobs.id }).from(schema.jobs).where(eq(schema.jobs.id, id)).get()) {
     throw new Error("Job not found");
   }
-  const log = fs.openSync(path.join(process.cwd(), "data", "autofill.log"), "a");
-  spawn("pnpm", ["autofill", id], { cwd: process.cwd(), detached: true, stdio: ["ignore", log, log] }).unref();
+  const log = fs.openSync(path.join(/*turbopackIgnore: true*/ DATA_DIR, "autofill.log"), "a");
+  const statusFile = path.join(os.tmpdir(), `offer-pilot-autofill-${randomUUID()}.json`);
+  const dryRun = process.env.OFFER_PILOT_AUTOFILL_DRY_RUN === "1" ? ["--dry-run"] : []; // end-to-end tests stay out of real Chrome
+  const child = spawn("pnpm", ["autofill", id, ...dryRun], {
+    cwd: process.cwd(),
+    detached: true,
+    stdio: ["ignore", log, log],
+    env: { ...process.env, OFFER_PILOT_AUTOFILL_STATUS: statusFile },
+  });
+  child.on("error", () => writeStatus(statusFile, { state: "failed" }));
+  child.unref();
+  return waitForStatus(statusFile, AUTOFILL_WAIT_MS);
 }
 
 // Live preview on the board form; reads only, so it also works in the demo

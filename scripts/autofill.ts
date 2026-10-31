@@ -10,7 +10,11 @@ import { fetchGreenhouseQuestions, planGreenhouseFill } from "../src/lib/autofil
 import { fetchLeverForm, planLeverFill } from "../src/lib/autofill/lever";
 import { summarize, type FillPlan } from "../src/lib/autofill/plan";
 import { loadProfile } from "../src/lib/autofill/profile";
-import { fillPage, openChrome } from "../src/lib/autofill/runner";
+import { ChromeBusyError, fillPage, openChromeTab } from "../src/lib/autofill/runner";
+import { writeStatus, type AutofillResult } from "../src/lib/autofill/status";
+
+// Set when the web app started this run, to show the result on the button
+const report = (result: AutofillResult) => writeStatus(process.env.OFFER_PILOT_AUTOFILL_STATUS, result);
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
@@ -72,7 +76,11 @@ async function main() {
   const t = resolveTarget(target!);
   const cls = classifyApplyUrl(t.url);
 
-  const plan = await buildPlan(t);
+  // The posting may be gone or the form unreadable: the page itself can still be opened
+  const plan = await buildPlan(t).catch((err: Error) => {
+    console.log(`Could not read the form (${err.message}); only opening the page.`);
+    return null;
+  });
   if (plan) printPlan(plan);
   else if (cls.kind === "login") {
     console.log(`This is ${cls.ats}, which needs a login or an account first. The tool never creates accounts: sign in and fill the form yourself.`);
@@ -81,10 +89,11 @@ async function main() {
   } else {
     console.log("Unknown job site; only opening the page.");
   }
-  if (dryRun) return;
+  const counts = plan ? summarize(plan) : null;
+  const done: AutofillResult = counts ? { state: "filled", filled: counts.fill, manual: counts.manual } : { state: cls.kind === "login" ? "login" : "opened" };
+  if (dryRun) return report(done);
 
-  const context = await openChrome();
-  const page = context.pages()[0] ?? (await context.newPage());
+  const { page, release } = await openChromeTab();
   await page.goto(plan?.url ?? t.url, { waitUntil: "domcontentloaded" });
 
   if (plan) {
@@ -94,11 +103,13 @@ async function main() {
     for (const r of failed) console.log(`⚠️  ${r.label}：${r.detail}`);
     console.log("\nDone. Check the highlighted fields in Chrome, **submit the form yourself**, then mark the job as Applied in Offer Pilot.");
   }
-  console.log("Close the Chrome window to finish.");
-  await new Promise<void>((resolve) => context.on("close", () => resolve()));
+  report(done);
+  await release();
+  console.log("Chrome stays open for you. Close the tab whenever you are done; nothing is waiting on it.");
 }
 
 main().catch((err) => {
   console.error(err);
+  report({ state: err instanceof ChromeBusyError ? "busy" : "failed" });
   process.exit(1);
 });

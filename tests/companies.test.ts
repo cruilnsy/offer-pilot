@@ -1,9 +1,11 @@
-// The company list: the template is valid, and a missing list is not an error for the web app.
+// Local files: the company list template, a missing list, and autofill run results.
 // Run: pnpm test
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
+import { waitForStatus, writeStatus } from "../src/lib/autofill/status";
 import { loadCompanies } from "../src/lib/companies";
 
 test("the template lists a company on a sample source", () => {
@@ -18,4 +20,13 @@ test("the template lists a company on a sample source", () => {
 
 test("no list yet means no companies", () => {
   assert.deepEqual(loadCompanies(path.join(__dirname, "no-such-file.json")), []);
+});
+
+test("an autofill run's result reaches the web app once, and a slow run times out", async () => {
+  const file = path.join(os.tmpdir(), `offer-pilot-status-test-${process.pid}.json`);
+  writeStatus(undefined, { state: "failed" });
+  setTimeout(() => writeStatus(file, { state: "filled", filled: 15, manual: 4 }), 50);
+  assert.deepEqual(await waitForStatus(file, 2000, 10), { state: "filled", filled: 15, manual: 4 });
+  assert.equal(fs.existsSync(file), false);
+  assert.deepEqual(await waitForStatus(file, 30, 10), { state: "timeout" });
 });

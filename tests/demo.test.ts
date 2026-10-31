@@ -72,7 +72,7 @@ test("server actions refuse to write or start autofill, but previews work", asyn
   form.set("id", job.id);
   form.set("status", "skipped");
   await assert.rejects(setJobStatus(form), /read-only/i);
-  await assert.rejects(startAutofill(form), /read-only/i);
+  await assert.rejects(startAutofill(null, form), /read-only/i);
   await assert.rejects(saveBoard(null, "Mine", { include: ["react"] }), /read-only/i);
   await assert.rejects(removeBoard(1), /read-only/i);
   for (const action of [actions.toggleSource, actions.addSource, actions.removeSource, actions.addTrackedCompany, actions.removeTrackedCompany, actions.saveWorkaroundSource, actions.removeWorkaround]) {

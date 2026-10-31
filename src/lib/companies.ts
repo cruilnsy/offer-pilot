@@ -5,10 +5,11 @@ import type { Company } from "./ats/types";
 import { DEMO } from "./demo";
 
 // Local files the user owns. OFFER_PILOT_DATA_DIR points elsewhere for tests.
-export const DATA_DIR = process.env.OFFER_PILOT_DATA_DIR || path.join(process.cwd(), "data");
+// turbopackIgnore: builds must not scan data/, which holds private files and a live Chrome profile
+export const DATA_DIR = process.env.OFFER_PILOT_DATA_DIR || path.join(/*turbopackIgnore: true*/ process.cwd(), "data");
 
 // The real list lives in data/companies.json (git-ignored); data/companies.example.json shows the shape.
-export const COMPANIES_PATH = path.join(DATA_DIR, "companies.json");
+export const COMPANIES_PATH = path.join(/*turbopackIgnore: true*/ DATA_DIR, "companies.json");
 
 /** Companies to fetch, or none yet: a fresh clone has no list. The demo never reads local files. */
 export function loadCompanies(file = COMPANIES_PATH): Company[] {
@@ -19,9 +20,9 @@ export function loadCompanies(file = COMPANIES_PATH): Company[] {
 
 /** Write through a temp file, so a crash cannot leave half a list. */
 export function writeJson(file: string, value: unknown) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(`${file}.tmp`, `${JSON.stringify(value, null, 2)}\n`);
-  fs.renameSync(`${file}.tmp`, file);
+  fs.mkdirSync(/*turbopackIgnore: true*/ path.dirname(file), { recursive: true });
+  fs.writeFileSync(/*turbopackIgnore: true*/ `${file}.tmp`, `${JSON.stringify(value, null, 2)}\n`);
+  fs.renameSync(/*turbopackIgnore: true*/ `${file}.tmp`, file);
 }
 
 export function addCompany(company: Company, file = COMPANIES_PATH) {
