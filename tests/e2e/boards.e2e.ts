@@ -53,14 +53,14 @@ test("a new user is guided to create a board from a template", async () => {
 
   await page.getByRole("button", { name: "Data", exact: true }).click();
   assert.equal(await page.getByLabel("Name", { exact: true }).locator("visible=true").inputValue(), "Data");
-  await page.getByText("2 open jobs right now").waitFor();
+  await page.getByRole("complementary").getByText("2 open jobs right now").waitFor();
   await page.getByRole("complementary").getByText("Sirius Cybernetics").waitFor();
 });
 
 test("adding a location updates the preview live, and saving opens the board", async () => {
   await page.getByLabel(/Cities or regions/).fill("New York");
   await page.getByLabel(/Cities or regions/).press("Enter");
-  await page.getByText("3 open jobs right now").waitFor();
+  await page.getByRole("complementary").getByText("3 open jobs right now").waitFor();
 
   await page.getByRole("button", { name: "Save board" }).click();
   await page.waitForURL(`${BASE}/boards/data`);
@@ -83,7 +83,7 @@ test("editing a board changes its name and rules, and keeps its link", async () 
   await page.waitForURL(`${BASE}/boards/data/edit`);
   await page.getByLabel("Name", { exact: true }).locator("visible=true").fill("Analytics");
   await page.getByRole("button", { name: "Title has: data scientist ×" }).click();
-  await page.getByText("2 open jobs right now").waitFor();
+  await page.getByRole("complementary").getByText("2 open jobs right now").waitFor();
   await page.getByRole("button", { name: "Save board" }).click();
   await page.waitForURL(`${BASE}/boards/data`);
   await page.getByRole("heading", { name: "Analytics" }).waitFor();

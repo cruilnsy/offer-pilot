@@ -86,8 +86,9 @@ async function DirectSourcesTable({ t, locale }: { t: Dictionary; locale: Locale
 
   return (
     <>
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-neutral-200 text-neutral-500 dark:border-neutral-800">
+      {/* One table: on phones each row becomes a card (the md: classes restore the table) */}
+      <table className="block w-full text-left text-sm md:table">
+        <thead className="hidden border-b border-neutral-200 text-neutral-500 md:table-header-group dark:border-neutral-800">
           <tr>
             <th className="py-2 pr-4 font-normal">{s.colEnabled}</th>
             <th className="py-2 pr-4 font-normal">{s.colSource}</th>
@@ -99,36 +100,38 @@ async function DirectSourcesTable({ t, locale }: { t: Dictionary; locale: Locale
             {!DEMO && <th className="py-2 font-normal" />}
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+        <tbody className="block divide-y divide-neutral-200 md:table-row-group dark:divide-neutral-800">
           {sources.map((src) => {
             const key = src.id;
             const stat = lastStats[key];
             const off = disabled.includes(key);
             const connected = key in atsFetchers || key in boardFetchers;
             return (
-              <tr key={key} className={off ? "opacity-50" : undefined}>
-                <td className="py-2 pr-4">
+              <tr key={key} className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 md:table-row md:py-0 ${off ? "opacity-50" : ""}`}>
+                <td className="md:table-cell md:py-2 md:pr-4">
                   <SourceSwitch source={key} label={src.label} on={!off} hint={s.toggleHint} />
                 </td>
-                <td className="py-2 pr-4">
+                <td className="min-w-0 md:table-cell md:py-2 md:pr-4">
                   <a href={src.url} target="_blank" rel="noreferrer" className={`rounded px-1.5 py-0.5 text-xs ring-1 ring-inset ${badgeFor(key)}`}>
                     {src.label}
                   </a>
                   {!DEMO && !connected && <span className="ml-2 whitespace-nowrap text-xs text-amber-700 dark:text-amber-300">{s.noConnector}</span>}
                 </td>
-                <td className="py-2 pr-4 text-neutral-600 dark:text-neutral-400">{s.kind[src.kind]}</td>
-                <td className="py-2 pr-4 text-neutral-600 dark:text-neutral-400">{localText(src.how, locale)}</td>
-                <td className="py-2 pr-4 text-right">{src.kind === "ats" ? (companyCount[key] ?? 0) : "—"}</td>
-                <td className="py-2 pr-4 text-right">
+                <td className="col-span-3 text-neutral-600 md:table-cell md:py-2 md:pr-4 dark:text-neutral-400">{s.kind[src.kind]}</td>
+                <td className="col-span-3 text-neutral-600 md:table-cell md:py-2 md:pr-4 dark:text-neutral-400">{localText(src.how, locale)}</td>
+                <StatCell label={s.colCompanies}>{src.kind === "ats" ? (companyCount[key] ?? 0) : "—"}</StatCell>
+                <StatCell label={s.colLastFetched}>
                   {stat ? s.jobsCount(stat.jobs) : "—"}
                   {stat?.errors ? <span className="ml-1 text-red-600">{s.failedCount(stat.errors)}</span> : null}
-                </td>
-                <td className="py-2 text-right font-medium">{openMatches[key] ?? 0}</td>
+                </StatCell>
+                <StatCell label={s.colOpenMatches} last>
+                  <span className="font-medium">{openMatches[key] ?? 0}</span>
+                </StatCell>
                 {!DEMO && (
-                  <td className="py-2 pl-3 text-right">
+                  <td className="col-start-3 row-start-1 md:table-cell md:py-2 md:pl-3 md:text-right">
                     <form action={removeSource}>
                       <input type="hidden" name="source" value={key} />
-                      <button aria-label={`${s.companies.remove} ${src.label}`} title={s.companies.remove} className="px-1 text-neutral-400 hover:text-red-600">
+                      <button aria-label={`${s.companies.remove} ${src.label}`} title={s.companies.remove} className="px-2.5 text-neutral-400 hover:text-red-600 sm:px-1">
                         ×
                       </button>
                     </form>
@@ -168,6 +171,16 @@ async function DirectSourcesTable({ t, locale }: { t: Dictionary; locale: Locale
   );
 }
 
+/** A number column in the table; on phones it is a "label: value" line in the card */
+function StatCell({ label, last, children }: { label: string; last?: boolean; children: React.ReactNode }) {
+  return (
+    <td className={`col-span-3 flex justify-between md:table-cell md:py-2 md:text-right ${last ? "" : "md:pr-4"}`}>
+      <span className="text-neutral-500 md:hidden">{label}</span>
+      <span>{children}</span>
+    </td>
+  );
+}
+
 function SourceSwitch({ source, label, on, hint }: { source: string; label: string; on: boolean; hint: string }) {
   return (
     <form action={toggleSource}>
@@ -179,9 +192,9 @@ function SourceSwitch({ source, label, on, hint }: { source: string; label: stri
         aria-label={label}
         title={DEMO ? undefined : hint}
         disabled={DEMO}
-        className={`relative block h-5 w-9 rounded-full transition-colors disabled:cursor-not-allowed ${on ? "bg-blue-600" : "bg-neutral-300 dark:bg-neutral-700"}`}
+        className={`flex h-9 w-16 items-center rounded-full p-0.5 transition-colors disabled:cursor-not-allowed sm:h-5 sm:w-9 ${on ? "justify-end bg-blue-600" : "bg-neutral-300 dark:bg-neutral-700"}`}
       >
-        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${on ? "left-[18px]" : "left-0.5"}`} />
+        <span className="h-8 w-8 rounded-full bg-white sm:h-4 sm:w-4" />
       </button>
     </form>
   );
@@ -236,13 +249,13 @@ function CompanyList({ source, names, s }: { source: DirectSourceEntry; names: C
       {names.length > 0 && (
         <ul className="mt-2 flex flex-wrap gap-1.5">
           {names.map((c) => (
-            <li key={c.slug} className="flex items-center gap-1 rounded bg-white px-2 text-sm ring-1 ring-inset ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
+            <li key={c.slug} className="flex max-w-full items-center gap-1 rounded bg-white px-2 text-sm ring-1 ring-inset ring-neutral-200 dark:bg-neutral-800 dark:ring-neutral-700">
               {c.name}
               {!DEMO && (
                 <form action={removeTrackedCompany}>
                   <input type="hidden" name="source" value={ats} />
                   <input type="hidden" name="slug" value={c.slug} />
-                  <button aria-label={`${s.companies.remove} ${c.name}`} className="px-1 text-neutral-400 hover:text-red-600">
+                  <button aria-label={`${s.companies.remove} ${c.name}`} className="px-2 text-neutral-400 hover:text-red-600 sm:px-1">
                     ×
                   </button>
                 </form>
@@ -254,8 +267,8 @@ function CompanyList({ source, names, s }: { source: DirectSourceEntry; names: C
       {!DEMO && (
         <form action={addTrackedCompany} className="mt-2 flex flex-wrap gap-2">
           <input type="hidden" name="source" value={ats} />
-          <input name="name" required maxLength={80} aria-label={`${source.label}: ${s.companies.name}`} placeholder={s.companies.name} className="w-40 rounded-md border border-neutral-300 bg-transparent px-2 py-1 text-sm dark:border-neutral-700" />
-          <input name="slug" required maxLength={200} aria-label={`${source.label}: slug`} placeholder="slug" className="w-48 rounded-md border border-neutral-300 bg-transparent px-2 py-1 text-sm dark:border-neutral-700" />
+          <input name="name" required maxLength={80} aria-label={`${source.label}: ${s.companies.name}`} placeholder={s.companies.name} className="w-full rounded-md border sm:w-40 border-neutral-300 bg-transparent px-2 py-1 text-sm dark:border-neutral-700" />
+          <input name="slug" required maxLength={200} aria-label={`${source.label}: slug`} placeholder="slug" className="w-full rounded-md border sm:w-48 border-neutral-300 bg-transparent px-2 py-1 text-sm dark:border-neutral-700" />
           <button className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">{s.companies.add}</button>
         </form>
       )}

@@ -30,8 +30,8 @@ const BADGES = [
 
 /** Each source keeps one color without anyone having to pick it. */
 export function badgeFor(id: string): string {
-  const hash = [...id].reduce((sum, ch) => (sum * 31 + ch.charCodeAt(0)) % 1009, 7);
-  return BADGES[hash % BADGES.length];
+  const hash = [...id].reduce((sum, ch) => (sum * 33 + ch.charCodeAt(0)) >>> 0, 5381);
+  return BADGES[((hash ^ (hash >>> 7)) >>> 0) % BADGES.length];
 }
 
 export const MANUAL_BADGE = "bg-amber-50 text-amber-700 ring-amber-200";

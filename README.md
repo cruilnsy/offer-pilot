@@ -6,7 +6,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
 ![Playwright](https://img.shields.io/badge/Playwright-autofill-2ead33)
 
-**English** | [中文](README.zh-CN.md)
+**English** | [中文](README.zh-CN.md) | **[Live demo](https://offer-pilot-seven.vercel.app)**
 
 A semi-automatic job search tool. Every morning it pulls new postings from public ATS APIs and job boards, filters and dedupes them into one list, and when you pick a job it fills the application form in real Chrome — then stops, so **you** review and click Submit.
 
@@ -42,7 +42,7 @@ flowchart LR
 - **The runner** knows only a few field kinds (text, file, native select, combobox, radio/checkbox/yes-no buttons), so a new ATS is mostly a new planner.
 
 ## Try the demo
-No setup beyond `pnpm install`: fictional companies in an in-memory database, read-only. It never touches `data/jobs.db`.
+**[Open the live demo](https://offer-pilot-seven.vercel.app)**: fictional data, read-only. To run it yourself, no setup beyond `pnpm install`: fictional companies in an in-memory database, read-only. It never touches `data/jobs.db`.
 ```bash
 pnpm install && pnpm demo   # http://localhost:3000/boards/ai
 ```

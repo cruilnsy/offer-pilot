@@ -46,14 +46,14 @@ export async function Dashboard({ board, searchParams }: { board: Board; searchP
             {t.jobs.views[v]} {counts[v]}
           </Link>
         ))}
-        <form className="ml-auto">
+        <form className="w-full sm:ml-auto sm:w-auto">
           <input type="hidden" name="view" value={view} />
           {source && <input type="hidden" name="source" value={source} />}
           <input
             name="q"
             defaultValue={q}
             placeholder={t.jobs.searchPlaceholder}
-            className="w-56 rounded-md border border-neutral-300 bg-transparent px-3 py-1 text-sm dark:border-neutral-700"
+            className="w-full rounded-md sm:w-56 border border-neutral-300 bg-transparent px-3 py-1 text-sm dark:border-neutral-700"
           />
         </form>
       </nav>
@@ -104,7 +104,7 @@ function JobRow({ group, view, now, t, settings }: { group: JobGroup; view: View
   return (
     <li className="py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-[1_1_100%] sm:flex-1">
           <p className="text-sm text-neutral-500">
             {job.companyName}
             <SourceBadge source={job.source} manualLabel={t.jobs.manualSource} settings={settings} />
@@ -136,7 +136,7 @@ function JobRow({ group, view, now, t, settings }: { group: JobGroup; view: View
             </p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
           <a
             href={job.applyUrl ?? job.url}
             target="_blank"
