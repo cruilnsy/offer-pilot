@@ -3,7 +3,7 @@
 [![CI](https://github.com/cruilnsy/offer-pilot/actions/workflows/ci.yml/badge.svg)](https://github.com/cruilnsy/offer-pilot/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[English](README.md) | **中文**
+[English](README.md) | **中文** | **[在线演示](https://offer-pilot-seven.vercel.app)**
 
 每天早上从招聘系统的公开接口和招聘网站抓取新职位，筛选、去重后合并成一个列表；选中一个职位后，在真实的 Chrome 里自动填好申请表，然后停下来，由**你自己**检查并点提交。
 
@@ -39,7 +39,7 @@ flowchart LR
 - **执行器**只认几种字段（文本、文件、原生下拉框、可搜索下拉框、单选 / 多选 / 是否按钮），所以加一家新的 ATS，主要是写一个新的计划生成器。
 
 ## 试用演示版
-只要 `pnpm install`，不用其他配置：虚构的公司，存在内存数据库里，只读，不会碰 `data/jobs.db`。
+**[打开在线演示](https://offer-pilot-seven.vercel.app)**：虚构数据，只读。想自己运行的话，只要 `pnpm install`，不用其他配置：虚构的公司，存在内存数据库里，只读，不会碰 `data/jobs.db`。
 ```bash
 pnpm install && pnpm demo   # http://localhost:3000/boards/ai
 ```
