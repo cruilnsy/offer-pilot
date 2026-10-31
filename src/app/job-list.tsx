@@ -5,7 +5,8 @@ import { getLocale } from "@/i18n/locale";
 import { DEMO } from "@/lib/demo";
 import { getDashboard, parseView, VIEWS, type JobGroup, type View } from "@/lib/jobs";
 import { loadSourceSettings, sourceBadge, type SourceSettings } from "@/lib/source-settings";
-import { setJobStatus, startAutofill } from "./actions";
+import { setJobStatus } from "./actions";
+import { AutofillButton } from "./autofill-button";
 
 // The job list of one board
 
@@ -136,7 +137,7 @@ function JobRow({ group, view, now, t, settings }: { group: JobGroup; view: View
             </p>
           )}
         </div>
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
+        <div className="flex w-full flex-wrap items-start gap-2 sm:w-auto sm:shrink-0">
           <a
             href={job.applyUrl ?? job.url}
             target="_blank"
@@ -145,16 +146,7 @@ function JobRow({ group, view, now, t, settings }: { group: JobGroup; view: View
           >
             {t.jobs.openApply}
           </a>
-          <form action={startAutofill}>
-            <input type="hidden" name="id" value={job.id} />
-            <button
-              disabled={DEMO}
-              title={DEMO ? t.demo.disabled : t.jobs.autofillHint}
-              className="rounded-md border border-blue-600 px-3 py-1.5 text-sm text-blue-700 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950"
-            >
-              {t.jobs.autofill}
-            </button>
-          </form>
+          <AutofillButton id={job.id} label={t.jobs.autofill} hint={DEMO ? t.demo.disabled : t.jobs.autofillHint} disabled={DEMO} t={t.jobs.autofillStatus} />
           {view === "new" || view === "all" ? (
             <>
               <StatusButton id={job.id} status="applied" label={t.jobs.markApplied} disabledHint={t.demo.disabled} />

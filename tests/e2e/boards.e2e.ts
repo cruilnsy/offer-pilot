@@ -26,7 +26,7 @@ before(async () => {
   sqlite.close();
 
   server = spawn("pnpm", ["exec", "next", "start", "-p", String(PORT)], {
-    env: { ...process.env, OFFER_PILOT_DB: dbPath, OFFER_PILOT_DATA_DIR: path.dirname(dbPath), OFFER_PILOT_DEMO: "" },
+    env: { ...process.env, OFFER_PILOT_DB: dbPath, OFFER_PILOT_DATA_DIR: path.dirname(dbPath), OFFER_PILOT_DEMO: "", OFFER_PILOT_AUTOFILL_DRY_RUN: "1" },
     stdio: "ignore",
     detached: true,
   });
@@ -76,6 +76,15 @@ test("marking a job applied moves it and survives a reload", async () => {
   await page.reload();
   await page.getByRole("link", { name: "Applied 1" }).click();
   await page.getByRole("listitem").filter({ hasText: "Sirius Cybernetics" }).waitFor();
+});
+
+test("the autofill button shows that it is working, then the result", async () => {
+  const row = page.getByRole("listitem").filter({ hasText: "Nakatomi" });
+  await page.getByRole("link", { name: /^To review/ }).click();
+  await row.getByRole("button", { name: "Autofill" }).click();
+  await row.getByRole("status").waitFor({ timeout: 20_000 });
+  assert.match((await row.getByRole("status").textContent()) ?? "", /Opened in Chrome/);
+  assert.equal(await row.getByRole("button", { name: "Autofill" }).isEnabled(), true);
 });
 
 test("editing a board changes its name and rules, and keeps its link", async () => {

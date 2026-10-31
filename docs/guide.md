@@ -92,7 +92,7 @@ Click "Autofill" → Chrome opens and fills what it can
    ↓
 Review the whole form, complete the highlighted fields → click Submit yourself
    ↓
-Close Chrome → click "Applied" in the web app
+Close the tab → click "Applied" in the web app
 ```
 
 ### 4.1 Pick jobs
@@ -151,7 +151,7 @@ Markers in the output: ✅ will be filled; 🟡 for you to fill (highlighted); �
 
 | Problem | Fix |
 |---|---|
-| Nothing happens after clicking "Autofill" | Check `data/autofill.log`. Usually the previous Autofill Chrome window is still open (the dedicated profile can only run once at a time); close it first |
+| Autofill says the Chrome is in use | A Chrome window from an older version is still open. Close it and click again. Normally each job opens as a new tab in the same window. Details are in `data/autofill.log` |
 | A field you expected to be filled is highlighted | Check whether that field is still `TODO(confirm)` in `data/profile.json` |
 | A dropdown got the wrong option | Fix it by hand, then adjust the rule in `src/lib/autofill/rules.ts` |
 | No new jobs today | `tail data/fetch.log` for errors; run `pnpm fetch-jobs` by hand |

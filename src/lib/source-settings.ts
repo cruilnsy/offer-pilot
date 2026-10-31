@@ -9,7 +9,7 @@ import { badgeFor, MANUAL_BADGE, type DirectSourceEntry, type Text, type Workaro
 
 // Each user's own sources, in data/sources.json (git-ignored). A new install starts with none;
 // data/sources.example.json shows the shape and is what the demo displays.
-export const SETTINGS_PATH = path.join(DATA_DIR, "sources.json");
+export const SETTINGS_PATH = path.join(/*turbopackIgnore: true*/ DATA_DIR, "sources.json");
 
 export interface WorkaroundSource {
   id: string;

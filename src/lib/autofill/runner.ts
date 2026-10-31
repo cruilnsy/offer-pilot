@@ -1,5 +1,5 @@
 import path from "node:path";
-import { chromium, type BrowserContext, type Locator, type Page } from "playwright";
+import { chromium, type Locator, type Page } from "playwright";
 import type { FillPlan, FillStep, StepResult } from "./plan";
 
 // Executes a fill plan on an open page. It NEVER clicks a submit button:
@@ -7,13 +7,62 @@ import type { FillPlan, FillStep, StepResult } from "./plan";
 
 export const CHROME_PROFILE_DIR = path.join(process.cwd(), "data", "chrome-profile");
 
-/** Real Chrome with a dedicated, persistent profile, so sign-ins survive between runs. */
-export async function openChrome(opts: { headless?: boolean; profileDir?: string } = {}): Promise<BrowserContext> {
-  return chromium.launchPersistentContext(opts.profileDir ?? CHROME_PROFILE_DIR, {
-    channel: "chrome",
-    headless: opts.headless ?? false,
-    viewport: null,
+// Local only. Later runs use it to add a tab to the Chrome that is already open
+const DEBUG_PORT = 9339;
+const CONNECT_RETRIES = 3;
+const RETRY_GAP_MS = 1000;
+// Chrome says this differently with and without a window
+const PROFILE_IN_USE = /existing browser session|ProcessSingleton|profile.*in use/i;
+
+/** The profile is held by a Chrome window this tool cannot reach, e.g. one opened before this port existed. */
+export class ChromeBusyError extends Error {}
+
+export interface ChromeTab {
+  page: Page;
+  closed: Promise<void>; // resolves when the user is done with this tab
+  release: () => Promise<void>; // lets go of Chrome without closing it
+}
+
+async function connect(port: number): Promise<ChromeTab | null> {
+  const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`, { timeout: 2000 }).catch(() => null);
+  if (!browser) return null;
+  const page = await browser.contexts()[0].newPage();
+  await page.bringToFront();
+  const closed = new Promise<void>((resolve) => {
+    page.once("close", () => resolve());
+    browser.once("disconnected", () => resolve());
   });
+  return { page, closed, release: () => browser.close() };
+}
+
+/**
+ * A tab in real Chrome with a dedicated, persistent profile, so sign-ins survive between runs.
+ * Chrome allows one window per profile, so when it is already open the job gets a new tab there.
+ */
+export async function openChromeTab(opts: { headless?: boolean; profileDir?: string; port?: number } = {}): Promise<ChromeTab> {
+  const port = opts.port ?? DEBUG_PORT;
+  const existing = await connect(port);
+  if (existing) return existing;
+
+  try {
+    const context = await chromium.launchPersistentContext(opts.profileDir ?? CHROME_PROFILE_DIR, {
+      channel: "chrome",
+      headless: opts.headless ?? false,
+      viewport: null,
+      args: [`--remote-debugging-port=${port}`],
+    });
+    const page = context.pages()[0] ?? (await context.newPage());
+    return { page, closed: new Promise((resolve) => context.once("close", () => resolve())), release: async () => {} };
+  } catch (err) {
+    if (!PROFILE_IN_USE.test((err as Error).message)) throw err;
+  }
+  // Two clicks at once: the other run may still be starting Chrome. Starting it again would only open stray windows
+  for (let attempt = 0; attempt < CONNECT_RETRIES; attempt++) {
+    await new Promise((r) => setTimeout(r, RETRY_GAP_MS));
+    const tab = await connect(port);
+    if (tab) return tab;
+  }
+  throw new ChromeBusyError("Close the Offer Pilot Chrome window and try again");
 }
 
 const HIGHLIGHT_CLASS = "offer-pilot-needs-you";

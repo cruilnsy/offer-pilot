@@ -92,7 +92,7 @@ pnpm dev → 打开一个 Board →「待处理」
    ↓
 检查整张表，补上标黄的项 → 自己点 Submit
    ↓
-关掉 Chrome → 回网页点「已投递」
+关掉标签页 → 回网页点「已投递」
 ```
 
 ### 1. 挑职位
@@ -151,7 +151,7 @@ pnpm autofill <职位 id> --dry-run
 
 | 问题 | 解决 |
 |---|---|
-| 点「自动填表」后没反应 | 看 `data/autofill.log`。常见原因：上一个自动填表的 Chrome 窗口还开着（专用 profile 同一时间只能开一个），先关掉它 |
+| 提示专用 Chrome 被占用 | 旧版本打开的 Chrome 窗口还开着，关掉后再点一次。正常情况下每个职位会在同一个窗口里开新标签页。详情见 `data/autofill.log` |
 | 某项本来应该会填，却被标黄了 | 检查 `data/profile.json` 里这一项是不是还写着 `TODO(confirm)` |
 | 下拉框选错了 | 手动改过来，再调整 `src/lib/autofill/rules.ts` 里的规则 |
 | 今天没抓到新职位 | `tail data/fetch.log` 看有没有报错；手动跑 `pnpm fetch-jobs` |
