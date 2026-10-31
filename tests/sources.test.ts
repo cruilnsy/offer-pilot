@@ -38,6 +38,8 @@ test("badges come from the user's file, and a removed source still shows its id"
   assert.equal(sourceBadge("gone", settings, "Manual").label, "gone");
   assert.equal(badgeFor("one"), badgeFor("one"));
   assert.notEqual(new Set(["a", "b", "c", "d", "e", "f"].map(badgeFor)).size, 1);
+  assert.equal(new Set(["mock-ats", "mock-jobs", "mock-careers"].map(badgeFor)).size, 3, "the demo's sources look different");
+  for (let i = 0; i < 500; i++) assert.match(badgeFor(`source-${i}`), /^bg-\w+-50 /, `source-${i}`);
 });
 
 test("the sample file holds three fictional direct and workaround sources", () => {

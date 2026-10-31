@@ -66,8 +66,9 @@ const linkClass = "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400
 
 async function NavLinks() {
   const t = await getDictionary();
+  // On phones the links take their own row below the logo and controls, and scroll sideways when there are many boards
   return (
-    <>
+    <div className="order-last flex w-full items-center gap-x-6 overflow-x-auto whitespace-nowrap sm:order-none sm:w-auto sm:flex-wrap sm:overflow-visible sm:whitespace-normal">
       <Link href="/" className={linkClass}>
         {t.nav.sources}
       </Link>
@@ -79,6 +80,6 @@ async function NavLinks() {
       <Link href="/boards/new" className="text-blue-700 hover:underline dark:text-blue-300">
         + {t.nav.newBoard}
       </Link>
-    </>
+    </div>
   );
 }

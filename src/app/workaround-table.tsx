@@ -31,8 +31,8 @@ export function WorkaroundTable({ rows, t, readOnly }: { rows: WorkaroundRow[]; 
   return (
     <>
       {rows.length === 0 && editing !== "new" && <p className="text-sm text-neutral-500">{t.empty}</p>}
-      <table className={`w-full text-left text-sm ${rows.length === 0 ? "hidden" : ""}`}>
-        <thead className="border-b border-neutral-200 text-neutral-500 dark:border-neutral-800">
+      <table className={`w-full text-left text-sm ${rows.length === 0 ? "hidden" : "block md:table"}`}>
+        <thead className="hidden border-b border-neutral-200 text-neutral-500 md:table-header-group dark:border-neutral-800">
           <tr>
             <th className="py-2 pr-4 font-normal">{t.colSite}</th>
             <th className="py-2 pr-4 font-normal">{t.colKind}</th>
@@ -41,27 +41,27 @@ export function WorkaroundTable({ rows, t, readOnly }: { rows: WorkaroundRow[]; 
             <th className="py-2 font-normal" />
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+        <tbody className="block divide-y divide-neutral-200 md:table-row-group dark:divide-neutral-800">
           {rows.map((w) =>
             editing === w.id ? (
-              <tr key={w.id}>
-                <td colSpan={5} className="py-3">
+              <tr key={w.id} className="block md:table-row">
+                <td colSpan={5} className="block py-3 md:table-cell">
                   <WorkaroundForm row={w} t={t} onDone={close} />
                 </td>
               </tr>
             ) : (
-              <tr key={w.id}>
-                <td className="py-2 pr-4">
+              <tr key={w.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 md:table-row md:py-0">
+                <td className="min-w-0 md:table-cell md:py-2 md:pr-4">
                   <a href={w.url} target="_blank" rel="noreferrer" className="font-medium hover:underline">
                     {w.label}
                   </a>
                 </td>
-                <td className="py-2 pr-4 text-neutral-600 dark:text-neutral-400">{w.kind}</td>
-                <td className="py-2 pr-4">
+                <td className="col-span-2 row-start-2 text-neutral-600 md:table-cell md:py-2 md:pr-4 dark:text-neutral-400">{w.kind}</td>
+                <td className="col-start-2 row-start-1 text-right md:table-cell md:py-2 md:pr-4 md:text-left">
                   <span className={`whitespace-nowrap rounded px-1.5 text-xs ${STATUS_STYLE[w.status]}`}>{t.statuses[w.status]}</span>
                 </td>
-                <td className="py-2 pr-4 text-neutral-600 dark:text-neutral-400">{w.plan}</td>
-                <td className="whitespace-nowrap py-2 text-right">
+                <td className="col-span-2 text-neutral-600 md:table-cell md:py-2 md:pr-4 dark:text-neutral-400">{w.plan}</td>
+                <td className="col-span-2 whitespace-nowrap text-left md:table-cell md:py-2 md:text-right">
                   {!readOnly && (
                     <>
                       <button type="button" onClick={() => setEditing(w.id)} aria-label={`${t.edit} ${w.label}`} className="text-xs text-blue-700 hover:underline dark:text-blue-300">

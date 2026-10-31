@@ -22,8 +22,43 @@
   color-scheme: dark;
 }
 
+/*
+ * Phones: fingers need larger targets, and iOS zooms the page when a focused input is under 16px.
+ * Not in a Tailwind layer, so it wins over text-sm on inputs. [role="switch"] sizes itself.
+ */
+@media (max-width: 39.99rem) {
+  button:not([role="switch"]),
+  select,
+  input:not([type="checkbox"], [type="hidden"]) {
+    min-height: 2.5rem;
+  }
+
+  input:not([type="checkbox"], [type="hidden"]),
+  select {
+    font-size: 1rem;
+  }
+
+  summary {
+    padding-block: 0.5rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-wrap: anywhere; /* users name their own boards and sources: a long word must not stretch the page */
+}
+
+/* Controls have short labels: keep them on one line instead of shrinking letter by letter */
+button,
+a.rounded-md {
+  overflow-wrap: normal;
+  flex-shrink: 0;
 }
