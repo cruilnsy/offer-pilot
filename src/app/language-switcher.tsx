@@ -11,7 +11,7 @@ export async function LanguageSwitcher() {
   const locale = await getLocale();
   const t = DICTIONARIES[locale];
   return (
-    <div className="ml-auto flex items-center gap-2">
+    <div className="ml-auto flex shrink-0 items-center gap-2 sm:order-last">
       <ThemeToggle label={t.nav.theme} />
       <form action={setLocale} aria-label={t.nav.language} className="flex overflow-hidden rounded-md border border-neutral-300 text-xs dark:border-neutral-700">
         <HtmlLang lang={t.htmlLang} />

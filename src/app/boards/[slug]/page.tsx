@@ -32,7 +32,7 @@ async function BoardContent({ params, searchParams }: PageProps<"/boards/[slug]"
   return (
     <>
       <header className="mb-6 flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl font-semibold">{board.name}</h1>
           <p className="text-sm text-neutral-500">{summary(board, t)}</p>
         </div>

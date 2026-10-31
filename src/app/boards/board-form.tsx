@@ -56,7 +56,7 @@ export function BoardForm({ t, templates, board, readOnly }: Props) {
   };
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1fr_18rem]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_18rem]">
       <form
         className="space-y-5"
         onSubmit={(e) => {
@@ -135,13 +135,16 @@ export function BoardForm({ t, templates, board, readOnly }: Props) {
         {error && <p className="text-sm text-red-600">{error}</p>}
         {readOnly && <p className="text-sm text-amber-800 dark:text-amber-300">{t.demoSave}</p>}
 
-        <div className="flex items-center gap-3">
+        <div className="sticky bottom-0 -mx-4 flex items-center gap-3 border-t border-neutral-200 bg-background px-4 py-3 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 dark:border-neutral-800">
           <button
             disabled={readOnly || saving || !name.trim() || !rules.include.length}
             className="rounded-md bg-blue-600 px-4 py-1.5 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving ? t.saving : t.save}
           </button>
+          {preview && rules.include.length > 0 && (
+            <p className="min-w-0 truncate text-sm text-neutral-500 md:hidden">{preview.count === 0 ? t.previewNone : t.previewCount.replace("{n}", String(preview.count))}</p>
+          )}
           {board && (
             <button
               type="button"
@@ -229,9 +232,9 @@ function TagInput({
       {tags.length > 0 && (
         <ul className="mt-2 flex flex-wrap gap-1.5">
           {tags.map((tag) => (
-            <li key={tag} className="flex items-center gap-1 rounded bg-blue-50 pl-2 text-sm text-blue-900 dark:bg-blue-950 dark:text-blue-100">
+            <li key={tag} className="flex max-w-full items-center gap-1 rounded bg-blue-50 pl-2 text-sm text-blue-900 dark:bg-blue-950 dark:text-blue-100">
               {tag}
-              <button type="button" aria-label={`${label}: ${tag} ×`} onClick={() => onChange(tags.filter((t) => t !== tag))} className="px-1.5 text-blue-500 hover:text-blue-900 dark:hover:text-white">
+              <button type="button" aria-label={`${label}: ${tag} ×`} onClick={() => onChange(tags.filter((t) => t !== tag))} className="px-2.5 text-blue-500 hover:text-blue-900 sm:px-1.5 dark:hover:text-white">
                 ×
               </button>
             </li>
